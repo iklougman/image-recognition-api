@@ -11,8 +11,10 @@ export class NsfwService implements OnModuleInit {
   }
 
   async classifyImage(imageBuffer: Buffer) {
-    const image: any = tf.node.decodeImage(imageBuffer);
-    const predictions = await this.model.classify(image);
+    const image: tf.Tensor3D | tf.Tensor4D = tf.node.decodeImage(imageBuffer);
+    const predictions: nsfw.predictionType[] = await this.model.classify(
+      image as tf.Tensor3D,
+    );
     return predictions;
   }
 }

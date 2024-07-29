@@ -3,9 +3,13 @@ import {
   Post,
   UploadedFile,
   UseInterceptors,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { NsfwService } from './nsfw.service';
+import { ImageUploadDto } from '@dto/image.dto';
+import { predictionType } from 'nsfwjs';
 
 @Controller('nsfw')
 export class NsfwController {
@@ -13,8 +17,15 @@ export class NsfwController {
 
   @Post('analyze')
   @UseInterceptors(FileInterceptor('image'))
-  async analyze(@UploadedFile() file: any) {
-    const predictions = await this.nsfwService.classifyImage(file.buffer);
+  @UsePipes(new ValidationPipe({ transform: true }))
+  async analyze(
+    @UploadedFile() file: Express.Multer.File,
+  ): Promise<predictionType[]> {
+    const fileUploadDto = new ImageUploadDto();
+    fileUploadDto.image = file;
+    const predictions: predictionType[] = await this.nsfwService.classifyImage(
+      file.buffer,
+    );
     return predictions;
   }
 }
