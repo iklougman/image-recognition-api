@@ -1,5 +1,5 @@
 # Use the official Node.js 14 image.
-FROM node:14-slim
+FROM node:20-slim
 
 # Create and change to the app directory.
 WORKDIR /usr/src/app
@@ -9,12 +9,12 @@ COPY package*.json ./
 
 # Install production dependencies.
 RUN npm install
-
+RUN npm run build
 # Copy local code to the container image.
 COPY . .
 
 # Copy the environment variable file
-COPY .env ./
+#COPY .env ./
 
 # Install TensorFlow.js dependencies.
 RUN apt-get update && apt-get install -y \
@@ -29,4 +29,4 @@ RUN npm install @tensorflow/tfjs-node nsfwjs @nestjs/platform-express
 EXPOSE 3000
 
 # Run the web service on container startup.
-CMD ["npm", "run", "start:prod"]
+CMD ["node", "run", "dist/main.js"]
